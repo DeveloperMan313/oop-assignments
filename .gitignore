@@ -49,3 +49,6 @@
 *build
 *cmake-build-debug
 *main.dSYM
+
+# clangd
+.cache
