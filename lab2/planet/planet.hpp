@@ -5,6 +5,8 @@
 
 class Planet {
 public:
+  Planet();
+
   Planet(const char *_name, double _diameter, bool _hasLife,
          unsigned int _moonCount);
 
@@ -12,12 +14,15 @@ public:
 
   ~Planet();
 
-  char *name;
   double diameter;
   bool hasLife;
   unsigned int moonCount;
 
   void print();
+
+  char *getName() const;
+
+  void setName(const char *_name);
 
   static void dbPrint();
 
@@ -33,7 +38,13 @@ public:
 
   static size_t dbGetSz();
 
+  static void dbReadFile(const char *fname);
+
+  static void dbWriteFile(const char *fname);
+
 private:
+  char *name;
+
   static const size_t dbCapInit = 1, dbGrowthFactor = 2;
   static Planet **db;
   static size_t dbCap, dbSize;

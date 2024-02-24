@@ -3,7 +3,7 @@
 #include <iostream>
 
 int main() {
-  setlocale(LC_ALL, "Russian");
+  setlocale(LC_ALL, ".UTF8");
   const int a = 10, b = 32;
   std::cout << "Я умею суммировать! Зацени " << a << '+' << b << '=';
   myprint::printInt(mymath::sum(a, b));
