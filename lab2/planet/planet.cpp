@@ -1,8 +1,10 @@
 #include "planet.hpp"
+#include "../input/input.hpp"
+#include <algorithm>
 #include <cstddef>
 #include <cstring>
 #include <fstream>
-#include <iostream>
+#include <stdexcept>
 
 Planet **Planet::db;
 size_t Planet::dbCap, Planet::dbSize;
@@ -24,7 +26,7 @@ Planet::Planet(const Planet &planet)
 
 Planet::~Planet() { delete[] this->name; }
 
-void Planet::print() {
+void Planet::print() const {
   std::cout << "Название: " << this->name << '\n'
             << "Диаметр: " << this->diameter << '\n'
             << "Жизнь: " << this->hasLife << '\n'
@@ -37,12 +39,24 @@ void Planet::setName(const char *_name) {
   delete[] this->name;
   const size_t bufSz = strlen(_name) + 1;
   this->name = new char[bufSz];
-  strcpy_s(this->name, bufSz, _name);
+  strncpy(this->name, _name, bufSz);
+}
+
+double Planet::getDiameter() { return this->diameter; }
+
+void Planet::setDiameter(double _diameter) {
+  if (_diameter >= 0) {
+    this->diameter = _diameter;
+  }
 }
 
 void Planet::dbPrint() {
   for (size_t i = 0; i < dbSize; ++i) {
-    Planet::dbGet(i).print();
+    const Planet *planetPtr = Planet::dbGet(i);
+    if (planetPtr == nullptr) {
+      continue;
+    }
+    planetPtr->print();
     if (i < dbSize - 1) {
       std::cout << '\n';
     }
@@ -96,7 +110,7 @@ void Planet::dbDelete(size_t i) {
   db[i] = nullptr;
 }
 
-Planet &Planet::dbGet(size_t i) { return *db[i]; }
+Planet *Planet::dbGet(size_t i) { return db[i]; }
 
 void Planet::dbInit() {
   dbCap = dbCapInit;
@@ -122,31 +136,48 @@ void Planet::dbWriteFile(const char *fname) {
     if (db[i] == nullptr) {
       continue;
     }
-    file << *db[i];
+    file << *db[i] << '\n';
   }
 }
 
-std::ifstream &operator>>(std::ifstream &in, Planet &planet) {
-  const size_t pos = in.tellg();
-  size_t nameLen;
-  for (size_t i = 0;; ++i) {
-    char c;
-    if (!in.get(c) || c == ' ') {
-      nameLen = i;
-      break;
+void Planet::dbSort() {
+  const auto cmp = [](const Planet *p1, const Planet *p2) { return *p1 < *p2; };
+  std::sort(db, db + dbSize, cmp);
+}
+
+size_t Planet::idxByName(const char *name) {
+  const size_t dbSz = Planet::dbGetSz();
+  for (size_t i = 0; i < dbSz; ++i) {
+    const Planet *planetPtr = Planet::dbGet(i);
+    if (planetPtr == nullptr) {
+      continue;
+    }
+    if (strcmp(name, planetPtr->getName()) == 0) {
+      return i;
     }
   }
-  in.seekg(pos);
-  char *_name = new char[nameLen + 1];
-  in >> _name >> planet.diameter >> planet.hasLife >> planet.moonCount;
-  planet.setName(_name);
-  delete[] _name;
+  throw std::invalid_argument("not found");
+}
+
+bool operator<(const Planet &p1, const Planet &p2) {
+  return p1.diameter < p2.diameter;
+}
+
+bool operator==(const Planet &p1, const Planet &p2) {
+  return p1.diameter == p2.diameter;
+}
+
+std::istream &operator>>(std::istream &in, Planet &planet) {
+  char *name = readString(in);
+  in >> planet.diameter >> planet.hasLife >> planet.moonCount;
+  delete[] planet.name;
+  planet.name = name;
   return in;
 }
 
-std::ofstream &operator<<(std::ofstream &out, const Planet &planet) {
-  out << planet.getName() << ' ' << planet.diameter << ' ' << planet.hasLife
-      << ' ' << planet.moonCount << std::endl;
+std::ostream &operator<<(std::ostream &out, const Planet &planet) {
+  out << planet.name << ' ' << planet.diameter << ' ' << planet.hasLife << ' '
+      << planet.moonCount;
   return out;
 }
 
@@ -160,4 +191,145 @@ void addSolarSystem() {
   Planet::dbAdd(Planet("Уран", 51108.0, false, 5));
   Planet::dbAdd(Planet("Нептун", 49600.0, false, 2));
   Planet::dbAdd(Planet("Плутон", 2280.0, false, 1));
+}
+
+size_t idxByNameUI(std::istream &in, bool demo) {
+  std::cout << "Введите имя планеты:" << std::endl;
+  char *name = readString(in);
+  if (demo) {
+    std::cout << name << std::endl;
+  }
+  Planet *planetPtr;
+  try {
+    const size_t idx = Planet::idxByName(name);
+    delete[] name;
+    return idx;
+  } catch (const std::invalid_argument &) {
+    std::cout << "Планета не найдена" << std::endl;
+    delete[] name;
+    throw std::invalid_argument("not found");
+  }
+}
+
+void editPlanet(std::istream &in, bool demo) {
+  const Planet *planetPtr;
+  try {
+    planetPtr = Planet::dbGet(idxByNameUI(in, demo));
+  } catch (const std::invalid_argument &) {
+    return;
+  }
+  Planet planet = *planetPtr;
+  std::cout << "Выберите параметр для изменения:\n"
+               "1 - имя\n"
+               "2 - диаметр\n"
+               "3 - наличие жизни\n"
+               "4 - количество спутников"
+            << std::endl;
+  int option;
+  in >> option;
+  while (true) {
+    switch (option) {
+    case 1: {
+      char *newName = readString(in);
+      if (demo) {
+        std::cout << newName << std::endl;
+      }
+      planet.setName(newName);
+      delete[] newName;
+      break;
+    }
+    case 2: {
+      double diameter;
+      in >> diameter;
+      if (demo) {
+        std::cout << diameter << std::endl;
+      }
+      planet.setDiameter(diameter);
+      break;
+    }
+    case 3:
+      in >> planet.hasLife;
+      if (demo) {
+        std::cout << planet.hasLife << std::endl;
+      }
+      break;
+    case 4:
+      in >> planet.moonCount;
+      if (demo) {
+        std::cout << planet.moonCount << std::endl;
+      }
+      break;
+    default:
+      std::cout << "Неверная опция" << std::endl;
+      continue;
+    }
+    break;
+  }
+}
+
+void planetMenu(std::istream &in, bool demo) {
+  while (true) {
+    std::cout << "Выберите действие:\n"
+                 "1 - прочитать БД из файла\n"
+                 "2 - записать БД в файл\n"
+                 "3 - отсортировать БД по размеру планет\n"
+                 "4 - добавить новый объект в БД\n"
+                 "5 - удалить объект из БД\n"
+                 "6 - редактировать БД\n"
+                 "7 - вывести БД на экран\n"
+                 "8 - выйти"
+              << std::endl;
+    int option;
+    in >> option;
+    switch (option) {
+    case 1: {
+      char *fname = readString(in);
+      if (demo) {
+        std::cout << fname << std::endl;
+      }
+      Planet::dbReadFile(fname);
+      delete[] fname;
+      break;
+    }
+    case 2: {
+      char *fname = readString(in);
+      if (demo) {
+        std::cout << fname << std::endl;
+      }
+      Planet::dbWriteFile(fname);
+      delete[] fname;
+      break;
+    }
+    case 3:
+      Planet::dbSort();
+      break;
+    case 4: {
+      Planet planet;
+      in >> planet;
+      if (demo) {
+        std::cout << planet << std::endl;
+      }
+      Planet::dbAdd(planet);
+      break;
+    }
+    case 5: {
+      try {
+        Planet::dbDelete(idxByNameUI(in, demo));
+      } catch (const std::invalid_argument &) { }
+      break;
+    }
+    case 6:
+      editPlanet(in, demo);
+      break;
+    case 7:
+      Planet::dbPrint();
+      break;
+    case 8:
+      return;
+    default:
+      std::cout << "Неверная опция" << std::endl;
+      continue;
+    }
+    std::cout << std::endl;
+  }
 }
