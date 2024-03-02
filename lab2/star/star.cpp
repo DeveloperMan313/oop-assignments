@@ -1,4 +1,4 @@
-#include "planet.hpp"
+#include "star.hpp"
 #include "../input/input.hpp"
 #include <algorithm>
 #include <cstddef>
@@ -7,64 +7,78 @@
 #include <limits>
 #include <stdexcept>
 
-Planet **Planet::db;
-size_t Planet::dbCap, Planet::dbSize;
+Star **Star::db;
+size_t Star::dbCap, Star::dbSize;
 
-Planet::Planet()
-    : name(nullptr), diameter(0.0), hasLife(false), moonCount(0u) {}
+Star::Star() : name(nullptr), diameter(0.0), mass(1.0), temp(0.0) {}
 
-Planet::Planet(const char *_name, double _diameter, bool _hasLife,
-               unsigned int _moonCount)
+Star::Star(const char *_name, double _diameter, bool _mass, unsigned int _temp)
     : name(nullptr) {
   this->setName(_name);
   this->diameter = _diameter;
-  this->hasLife = _hasLife;
-  this->moonCount = _moonCount;
+  this->mass = _mass;
+  this->temp = _temp;
 }
 
-Planet::Planet(const Planet &planet)
-    : Planet(planet.name, planet.diameter, planet.hasLife, planet.moonCount) {}
+Star::Star(const Star &star)
+    : Star(star.name, star.diameter, star.mass, star.temp) {}
 
-Planet::~Planet() { delete[] this->name; }
+Star::~Star() { delete[] this->name; }
 
-void Planet::print() const {
+void Star::print() const {
   std::cout << "Название: " << this->name << '\n'
             << "Диаметр: " << this->diameter << '\n'
-            << "Жизнь: " << this->hasLife << '\n'
-            << "Спутники: " << this->moonCount << std::endl;
+            << "Масса: " << this->mass << '\n'
+            << "Температура: " << this->temp << std::endl;
 }
 
-char *Planet::getName() const { return this->name; }
+char *Star::getName() const { return this->name; }
 
-void Planet::setName(const char *_name) {
+void Star::setName(const char *_name) {
   delete[] this->name;
   const size_t bufSz = strlen(_name) + 1;
   this->name = new char[bufSz];
   strncpy(this->name, _name, bufSz);
 }
 
-double Planet::getDiameter() { return this->diameter; }
+double Star::getMass() { return this->mass; }
 
-void Planet::setDiameter(double _diameter) {
+void Star::setMass(double _mass) {
+  if (_mass > 0) {
+    this->mass = _mass;
+  }
+}
+
+double Star::getTemp() { return this->temp; }
+
+void Star::setTemp(double _temp) {
+  if (_temp >= 0) {
+    this->temp = _temp;
+  }
+}
+
+double Star::getDiameter() { return this->diameter; }
+
+void Star::setDiameter(double _diameter) {
   if (_diameter >= 0) {
     this->diameter = _diameter;
   }
 }
 
-void Planet::dbPrint() {
+void Star::dbPrint() {
   for (size_t i = 0; i < dbSize; ++i) {
-    const Planet *planetPtr = Planet::dbGet(i);
-    if (planetPtr == nullptr) {
+    const Star *starPtr = Star::dbGet(i);
+    if (starPtr == nullptr) {
       continue;
     }
-    planetPtr->print();
+    starPtr->print();
     if (i < dbSize - 1) {
       std::cout << '\n';
     }
   }
 }
 
-void Planet::dbClear() {
+void Star::dbClear() {
   for (size_t i = 0; i < dbSize; ++i) {
     delete db[i];
   }
@@ -72,38 +86,38 @@ void Planet::dbClear() {
   db = nullptr;
 }
 
-void Planet::dbResize(size_t cap) {
+void Star::dbResize(size_t cap) {
   if (cap < dbSize) {
     return;
   }
-  Planet **dbNew = new Planet *[cap];
+  Star **dbNew = new Star *[cap];
   for (size_t i = 0; i < dbSize; ++i) {
-    dbNew[i] = new Planet(*db[i]);
+    dbNew[i] = new Star(*db[i]);
   }
   dbClear();
   db = dbNew;
   dbCap = cap;
 }
 
-void Planet::dbAdd(const Planet &planet) {
+void Star::dbAdd(const Star &star) {
   if (db == nullptr) {
     dbInit();
   }
-  Planet *planetCopy = new Planet(planet);
+  Star *starCopy = new Star(star);
   for (size_t i = 0; i < dbSize; ++i) {
     if (db[i] == nullptr) {
-      db[i] = planetCopy;
+      db[i] = starCopy;
       return;
     }
   }
   if (dbSize == dbCap) {
     dbResize(dbCap * dbGrowthFactor);
   }
-  db[dbSize] = planetCopy;
+  db[dbSize] = starCopy;
   ++dbSize;
 }
 
-void Planet::dbDelete(size_t i) {
+void Star::dbDelete(size_t i) {
   if (i >= dbSize) {
     return;
   }
@@ -111,17 +125,17 @@ void Planet::dbDelete(size_t i) {
   db[i] = nullptr;
 }
 
-Planet *Planet::dbGet(size_t i) { return db[i]; }
+Star *Star::dbGet(size_t i) { return db[i]; }
 
-void Planet::dbInit() {
+void Star::dbInit() {
   dbCap = dbCapInit;
-  db = new Planet *[dbCap];
+  db = new Star *[dbCap];
   dbSize = 0;
 }
 
-size_t Planet::dbGetSz() { return dbSize; }
+size_t Star::dbGetSz() { return dbSize; }
 
-void Planet::dbReadFile(const char *fname) {
+void Star::dbReadFile(const char *fname) {
   std::ifstream file(fname, std::ios::binary);
   if (!file) {
     std::cout << "Ошибка открытия файла" << std::endl;
@@ -129,13 +143,13 @@ void Planet::dbReadFile(const char *fname) {
   }
   dbClear();
   dbInit();
-  Planet planet;
-  while (file >> planet) {
-    dbAdd(planet);
+  Star star;
+  while (file >> star) {
+    dbAdd(star);
   }
 }
 
-void Planet::dbWriteFile(const char *fname) {
+void Star::dbWriteFile(const char *fname) {
   std::ofstream file(fname, std::ios::binary);
   if (!file) {
     std::cout << "Ошибка открытия файла" << std::endl;
@@ -150,91 +164,79 @@ void Planet::dbWriteFile(const char *fname) {
   }
 }
 
-void Planet::dbSort() {
-  const auto cmp = [](const Planet *p1, const Planet *p2) { return *p2 < *p1; };
+void Star::dbSort() {
+  const auto cmp = [](const Star *p1, const Star *p2) { return *p2 < *p1; };
   std::sort(db, db + dbSize, cmp);
 }
 
-size_t Planet::idxByName(const char *name) {
-  const size_t dbSz = Planet::dbGetSz();
+size_t Star::idxByName(const char *name) {
+  const size_t dbSz = Star::dbGetSz();
   for (size_t i = 0; i < dbSz; ++i) {
-    const Planet *planetPtr = Planet::dbGet(i);
-    if (planetPtr == nullptr) {
+    const Star *starPtr = Star::dbGet(i);
+    if (starPtr == nullptr) {
       continue;
     }
-    if (strcmp(name, planetPtr->getName()) == 0) {
+    if (strcmp(name, starPtr->getName()) == 0) {
       return i;
     }
   }
   throw std::invalid_argument("not found");
 }
 
-bool operator<(const Planet &p1, const Planet &p2) {
+bool operator<(const Star &p1, const Star &p2) {
   return p1.diameter < p2.diameter;
 }
 
-bool operator==(const Planet &p1, const Planet &p2) {
+bool operator==(const Star &p1, const Star &p2) {
   return p1.diameter == p2.diameter;
 }
 
-std::istream &operator>>(std::istream &in, Planet &planet) {
+std::istream &operator>>(std::istream &in, Star &star) {
   char *name = readString(in);
-  in >> planet.diameter >> planet.hasLife >> planet.moonCount;
-  delete[] planet.name;
-  planet.name = name;
+  in >> star.diameter >> star.mass >> star.temp;
+  delete[] star.name;
+  star.name = name;
   return in;
 }
 
-std::ostream &operator<<(std::ostream &out, const Planet &planet) {
-  out << planet.name << ' ' << planet.diameter << ' ' << planet.hasLife << ' '
-      << planet.moonCount;
+std::ostream &operator<<(std::ostream &out, const Star &star) {
+  out << star.name << ' ' << star.diameter << ' ' << star.mass << ' '
+      << star.temp;
   return out;
 }
 
-void addSolarSystem() {
-  Planet::dbAdd(Planet("Меркурий", 4878.0, false, 0));
-  Planet::dbAdd(Planet("Венера", 12104.0, false, 0));
-  Planet::dbAdd(Planet("Земля", 12774.0, true, 1));
-  Planet::dbAdd(Planet("Марс", 6786.0, true, 2));
-  Planet::dbAdd(Planet("Юпитер", 142796.0, false, 16));
-  Planet::dbAdd(Planet("Сатурн", 120000.0, false, 17));
-  Planet::dbAdd(Planet("Уран", 51108.0, false, 5));
-  Planet::dbAdd(Planet("Нептун", 49600.0, false, 2));
-  Planet::dbAdd(Planet("Плутон", 2280.0, false, 1));
-}
-
-size_t idxByPlanetNameUI(std::istream &in, bool demo) {
-  std::cout << "Введите имя планеты:" << std::endl;
+size_t idxByStarNameUI(std::istream &in, bool demo) {
+  std::cout << "Введите имя звезды:" << std::endl;
   char *name = readString(in);
   if (demo) {
     std::cout << name << std::endl;
   }
-  Planet *planetPtr;
+  Star *starPtr;
   try {
-    const size_t idx = Planet::idxByName(name);
+    const size_t idx = Star::idxByName(name);
     delete[] name;
     return idx;
   } catch (const std::invalid_argument &) {
-    std::cout << "Планета не найдена" << std::endl;
+    std::cout << "Звезда не найдена" << std::endl;
     delete[] name;
     throw std::invalid_argument("not found");
   }
 }
 
-void editPlanet(std::istream &in, bool demo) {
-  Planet *planetPtr;
+void editStar(std::istream &in, bool demo) {
+  Star *starPtr;
   try {
-    planetPtr = Planet::dbGet(idxByPlanetNameUI(in, demo));
+    starPtr = Star::dbGet(idxByStarNameUI(in, demo));
   } catch (const std::invalid_argument &) {
     return;
   }
-  Planet &planet = *planetPtr;
+  Star &star = *starPtr;
   while (true) {
     std::cout << "Выберите параметр для изменения:\n"
                  "1 - имя\n"
                  "2 - диаметр\n"
-                 "3 - наличие жизни\n"
-                 "4 - количество спутников\n"
+                 "3 - масса\n"
+                 "4 - температура\n"
                  "5 - отменить изменение"
               << std::endl;
     int option;
@@ -245,7 +247,7 @@ void editPlanet(std::istream &in, bool demo) {
       if (demo) {
         std::cout << newName << std::endl;
       }
-      planet.setName(newName);
+      star.setName(newName);
       delete[] newName;
       break;
     }
@@ -255,21 +257,27 @@ void editPlanet(std::istream &in, bool demo) {
       if (demo) {
         std::cout << diameter << std::endl;
       }
-      planet.setDiameter(diameter);
+      star.setDiameter(diameter);
       break;
     }
-    case 3:
-      in >> planet.hasLife;
+    case 3: {
+      double mass;
+      in >> mass;
+      star.setMass(mass);
       if (demo) {
-        std::cout << planet.hasLife << std::endl;
+        std::cout << star.getMass() << std::endl;
       }
       break;
-    case 4:
-      in >> planet.moonCount;
+    }
+    case 4: {
+      double temp;
+      in >> temp;
+      star.setTemp(temp);
       if (demo) {
-        std::cout << planet.moonCount << std::endl;
+        std::cout << star.getTemp() << std::endl;
       }
       break;
+    }
     case 5:
       return;
     default:
@@ -283,7 +291,7 @@ void editPlanet(std::istream &in, bool demo) {
   }
 }
 
-void planetMenu(std::istream &in, bool demo) {
+void starMenu(std::istream &in, bool demo) {
   while (true) {
     std::cout << "Выберите действие:\n"
                  "1 - прочитать БД из файла\n"
@@ -303,7 +311,7 @@ void planetMenu(std::istream &in, bool demo) {
       if (demo) {
         std::cout << fname << std::endl;
       }
-      Planet::dbReadFile(fname);
+      Star::dbReadFile(fname);
       delete[] fname;
       break;
     }
@@ -312,33 +320,33 @@ void planetMenu(std::istream &in, bool demo) {
       if (demo) {
         std::cout << fname << std::endl;
       }
-      Planet::dbWriteFile(fname);
+      Star::dbWriteFile(fname);
       delete[] fname;
       break;
     }
     case 3:
-      Planet::dbSort();
+      Star::dbSort();
       break;
     case 4: {
-      Planet planet;
-      in >> planet;
+      Star star;
+      in >> star;
       if (demo) {
-        std::cout << planet << std::endl;
+        std::cout << star << std::endl;
       }
-      Planet::dbAdd(planet);
+      Star::dbAdd(star);
       break;
     }
     case 5: {
       try {
-        Planet::dbDelete(idxByPlanetNameUI(in, demo));
+        Star::dbDelete(idxByStarNameUI(in, demo));
       } catch (const std::invalid_argument &) {}
       break;
     }
     case 6:
-      editPlanet(in, demo);
+      editStar(in, demo);
       break;
     case 7:
-      Planet::dbPrint();
+      Star::dbPrint();
       break;
     case 8:
       return;

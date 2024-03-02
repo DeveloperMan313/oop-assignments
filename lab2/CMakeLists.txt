@@ -6,11 +6,12 @@ project(${project})
 set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory(planet)
+add_subdirectory(star)
 add_subdirectory(input)
 
 add_executable(${project} main.cpp)
 
-target_link_libraries(${project} planet input)
+target_link_libraries(${project} planet star input)
 
 if(NOT WIN32)
   target_link_libraries(${project} m)

@@ -52,4 +52,4 @@
 
 # clangd
 .cache
-.clangd
+.clang*

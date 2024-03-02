@@ -70,7 +70,7 @@ private:
 
 void addSolarSystem();
 
-size_t idxByNameUI(std::istream &in, bool demo);
+size_t idxByPlanetNameUI(std::istream &in, bool demo);
 
 void editPlanet(std::istream &in, bool demo);
 
