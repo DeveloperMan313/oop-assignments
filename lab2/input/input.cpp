@@ -1,6 +1,8 @@
 #include "input.hpp"
 #include <cstring>
 
+const char *inputIndicator = "> ";
+
 char *readString(std::istream &in) {
   char buf[64];
   in >> buf;

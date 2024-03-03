@@ -15,11 +15,9 @@ Planet::Planet()
 
 Planet::Planet(const char *_name, double _diameter, bool _hasLife,
                unsigned int _moonCount)
-    : name(nullptr) {
+    : name(nullptr), diameter(_diameter), hasLife(_hasLife),
+      moonCount(_moonCount) {
   this->setName(_name);
-  this->diameter = _diameter;
-  this->hasLife = _hasLife;
-  this->moonCount = _moonCount;
 }
 
 Planet::Planet(const Planet &planet)
@@ -28,8 +26,8 @@ Planet::Planet(const Planet &planet)
 Planet::~Planet() { delete[] this->name; }
 
 void Planet::print() const {
-  std::cout << "Название: " << this->name << '\n'
-            << "Диаметр: " << this->diameter << '\n'
+  std::cout << "Имя: " << this->name << '\n'
+            << "Диаметр, км: " << this->diameter << '\n'
             << "Жизнь: " << this->hasLife << '\n'
             << "Спутники: " << this->moonCount << std::endl;
 }
@@ -43,7 +41,7 @@ void Planet::setName(const char *_name) {
   strncpy(this->name, _name, bufSz);
 }
 
-double Planet::getDiameter() { return this->diameter; }
+double Planet::getDiameter() const { return this->diameter; }
 
 void Planet::setDiameter(double _diameter) {
   if (_diameter >= 0) {
@@ -52,6 +50,10 @@ void Planet::setDiameter(double _diameter) {
 }
 
 void Planet::dbPrint() {
+  if (dbSize == 0) {
+    std::cout << "нет записей" << std::endl;
+    return;
+  }
   for (size_t i = 0; i < dbSize; ++i) {
     const Planet *planetPtr = Planet::dbGet(i);
     if (planetPtr == nullptr) {
@@ -191,18 +193,6 @@ std::ostream &operator<<(std::ostream &out, const Planet &planet) {
   return out;
 }
 
-void addSolarSystem() {
-  Planet::dbAdd(Planet("Меркурий", 4878.0, false, 0));
-  Planet::dbAdd(Planet("Венера", 12104.0, false, 0));
-  Planet::dbAdd(Planet("Земля", 12774.0, true, 1));
-  Planet::dbAdd(Planet("Марс", 6786.0, true, 2));
-  Planet::dbAdd(Planet("Юпитер", 142796.0, false, 16));
-  Planet::dbAdd(Planet("Сатурн", 120000.0, false, 17));
-  Planet::dbAdd(Planet("Уран", 51108.0, false, 5));
-  Planet::dbAdd(Planet("Нептун", 49600.0, false, 2));
-  Planet::dbAdd(Planet("Плутон", 2280.0, false, 1));
-}
-
 size_t idxByPlanetNameUI(std::istream &in, bool demo) {
   std::cout << "Введите имя планеты:" << std::endl;
   char *name = readString(in);
@@ -232,13 +222,17 @@ void editPlanet(std::istream &in, bool demo) {
   while (true) {
     std::cout << "Выберите параметр для изменения:\n"
                  "1 - имя\n"
-                 "2 - диаметр\n"
+                 "2 - диаметр, км\n"
                  "3 - наличие жизни\n"
                  "4 - количество спутников\n"
-                 "5 - отменить изменение"
+                 "5 - выйти"
               << std::endl;
+    std::cout << inputIndicator;
     int option;
     in >> option;
+    if (demo) {
+      std::cout << option << std::endl;
+    }
     switch (option) {
     case 1: {
       char *newName = readString(in);
@@ -279,26 +273,35 @@ void editPlanet(std::istream &in, bool demo) {
       std::cout << std::endl;
       continue;
     }
-    break;
+    std::cout << std::endl;
   }
 }
 
 void planetMenu(std::istream &in, bool demo) {
   while (true) {
     std::cout << "Выберите действие:\n"
-                 "1 - прочитать БД из файла\n"
-                 "2 - записать БД в файл\n"
-                 "3 - отсортировать БД по размеру планет\n"
-                 "4 - добавить новый объект в БД\n"
-                 "5 - удалить объект из БД\n"
-                 "6 - редактировать БД\n"
-                 "7 - вывести БД на экран\n"
-                 "8 - выйти"
+                 "0 - помощь"
               << std::endl;
+    const char *help = "1 - прочитать БД из файла\n"
+                       "2 - записать БД в файл\n"
+                       "3 - отсортировать БД по размеру планет\n"
+                       "4 - добавить новый объект в БД\n"
+                       "5 - удалить объект из БД\n"
+                       "6 - редактировать БД\n"
+                       "7 - вывести БД на экран\n"
+                       "8 - выйти";
+    std::cout << inputIndicator;
     int option;
     in >> option;
+    if (demo) {
+      std::cout << option << std::endl;
+    }
     switch (option) {
+    case 0:
+      std::cout << help << std::endl;
+      break;
     case 1: {
+      std::cout << "Введите имя файла" << std::endl;
       char *fname = readString(in);
       if (demo) {
         std::cout << fname << std::endl;
@@ -308,6 +311,7 @@ void planetMenu(std::istream &in, bool demo) {
       break;
     }
     case 2: {
+      std::cout << "Введите имя файла" << std::endl;
       char *fname = readString(in);
       if (demo) {
         std::cout << fname << std::endl;
@@ -320,6 +324,9 @@ void planetMenu(std::istream &in, bool demo) {
       Planet::dbSort();
       break;
     case 4: {
+      std::cout
+          << "Введите имя, диаметр в км, наличие жизни, количество спутников"
+          << std::endl;
       Planet planet;
       in >> planet;
       if (demo) {
@@ -328,16 +335,16 @@ void planetMenu(std::istream &in, bool demo) {
       Planet::dbAdd(planet);
       break;
     }
-    case 5: {
+    case 5:
       try {
         Planet::dbDelete(idxByPlanetNameUI(in, demo));
       } catch (const std::invalid_argument &) {}
       break;
-    }
     case 6:
       editPlanet(in, demo);
       break;
     case 7:
+      std::cout << "БД планет:" << std::endl;
       Planet::dbPrint();
       break;
     case 8:

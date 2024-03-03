@@ -23,7 +23,7 @@ public:
 
   void setName(const char *_name);
 
-  double getDiameter();
+  double getDiameter() const;
 
   void setDiameter(double _diameter);
 
@@ -67,8 +67,6 @@ private:
 
   friend std::ostream &operator<<(std::ostream &out, const Planet &planet);
 };
-
-void addSolarSystem();
 
 size_t idxByPlanetNameUI(std::istream &in, bool demo);
 
