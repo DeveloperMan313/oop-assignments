@@ -54,19 +54,20 @@ void Computer::setAge(double _ageYrs) {
 }
 
 void Computer::dbPrint() {
-  if (dbSize == 0) {
-    std::cout << "нет записей" << std::endl;
-    return;
-  }
+  bool found = false;
   for (size_t i = 0; i < dbSize; ++i) {
     const Computer *computerPtr = Computer::dbGet(i);
     if (computerPtr == nullptr) {
       continue;
     }
+    found = true;
     computerPtr->print();
     if (i < dbSize - 1) {
       std::cout << '\n';
     }
+  }
+  if (!found) {
+    std::cout << "нет записей" << std::endl;
   }
 }
 

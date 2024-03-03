@@ -50,19 +50,20 @@ void Planet::setDiameter(double _diameter) {
 }
 
 void Planet::dbPrint() {
-  if (dbSize == 0) {
-    std::cout << "нет записей" << std::endl;
-    return;
-  }
+  bool found = false;
   for (size_t i = 0; i < dbSize; ++i) {
     const Planet *planetPtr = Planet::dbGet(i);
     if (planetPtr == nullptr) {
       continue;
     }
+    found = true;
     planetPtr->print();
     if (i < dbSize - 1) {
       std::cout << '\n';
     }
+  }
+  if (!found) {
+    std::cout << "нет записей" << std::endl;
   }
 }
 
