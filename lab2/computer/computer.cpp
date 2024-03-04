@@ -210,7 +210,6 @@ size_t idxByComputerNameUI(std::istream &in, bool demo) {
   if (demo) {
     std::cout << name << std::endl;
   }
-  Computer *computerPtr;
   try {
     const size_t idx = Computer::idxByName(name);
     delete[] name;

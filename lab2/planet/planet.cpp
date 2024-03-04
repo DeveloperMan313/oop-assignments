@@ -200,7 +200,6 @@ size_t idxByPlanetNameUI(std::istream &in, bool demo) {
   if (demo) {
     std::cout << name << std::endl;
   }
-  Planet *planetPtr;
   try {
     const size_t idx = Planet::idxByName(name);
     delete[] name;
