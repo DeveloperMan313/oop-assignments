@@ -1,8 +1,26 @@
+#include "MyStack/MyStack.hpp"
 #include <iostream>
-#include <cstring>
+
+void multipliers(int n, MyStack<int> &stack) {
+  int k = 2;
+  while (n > 1) {
+    while (n % k > 0) {
+      ++k;
+    }
+    n /= k;
+    stack.push(k);
+  }
+}
 
 int main() {
-    setlocale(LC_ALL, "Russian");
-    // сюда решение
-    return 0;
+  const int n = 3960;
+  const char *eq = " = ";
+  const char *sep = " * ";
+  MyStack<int> stack;
+  multipliers(n, stack);
+  std::cout << n << eq;
+  stack.print(sep);
+  std::cout << n << eq;
+  stack.printReversed(sep);
+  return 0;
 }
