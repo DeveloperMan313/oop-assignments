@@ -8,7 +8,7 @@ private:
   INFO info;
   ListNode *next;
 
-  ListNode() : next(nullptr) {}
+  ListNode() : info(), next(nullptr) {}
 
   friend FRIEND;
 };
@@ -20,11 +20,9 @@ public:
 
   MyStack() : top(nullptr) {}
 
-  ~MyStack() {
-    while (!this->empty()) {
-      this->pop();
-    }
-  }
+  MyStack(const MyStack<INFO> &stack) : MyStack() { *this = stack; }
+
+  ~MyStack() { this->clear(); }
 
   bool empty() { return top == nullptr; }
 
@@ -41,6 +39,12 @@ public:
     this->top = newTop;
   }
 
+  void clear() {
+    while (!this->empty()) {
+      this->pop();
+    }
+  }
+
   INFO topInfo() { return this->top->info; }
 
   void print(const char *sep) {
@@ -55,19 +59,38 @@ public:
     std::cout << std::endl;
   }
 
-  void printReversed(const char *sep) { printReversedInner(sep, this->top); }
-
-private:
-  void printReversedInner(const char *sep, Node *node, bool outer = true) {
-    const INFO info = node->info;
-    if (node->next != nullptr) {
-      this->printReversedInner(sep, node->next, false);
+  void printReversed(const char *sep) {
+    MyStack<INFO> stack;
+    Node *node = this->top;
+    while (node != nullptr) {
+      stack.push(node->info);
+      node = node->next;
     }
-    std::cout << info;
-    if (outer) {
-      std::cout << std::endl;
-    } else {
-      std::cout << sep;
+    while (!stack.empty()) {
+      std::cout << stack.topInfo();
+      stack.pop();
+      if (stack.top != nullptr) {
+        std::cout << sep;
+      }
+    }
+    std::cout << std::endl;
+  }
+
+  void operator=(const MyStack<INFO> &stack) {
+    if (this->top == stack.top) {
+      return;
+    }
+    this->clear();
+    MyStack<INFO> temp;
+    Node *node = stack.top;
+    while (node != nullptr) {
+      temp.push(node->info);
+      node = node->next;
+    }
+    node = temp.top;
+    while (node != nullptr) {
+      this->push(node->info);
+      node = node->next;
     }
   }
 };
