@@ -52,6 +52,8 @@ private:
   int numer;
   unsigned int denom;
 
+  void checkDenom();
+
   void simplify();
 
   static unsigned int gcd(unsigned int a, unsigned int b);

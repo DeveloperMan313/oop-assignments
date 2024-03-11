@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <cstring>
 #include <sstream>
+#include <stdexcept>
 #include <variant>
 
 const size_t bufSz = 64;
@@ -11,10 +12,11 @@ Fraction::Fraction() : numer(1), denom(1u) {}
 
 Fraction::Fraction(int _numer, unsigned int _denom)
     : numer(_numer), denom(_denom) {
+  this->checkDenom();
   this->simplify();
 }
 
-Fraction::Fraction(const Fraction &f) : numer(f.numer), denom(f.denom) {}
+Fraction::Fraction(const Fraction &f) : Fraction(f.numer, f.denom) {}
 
 Fraction::Fraction(int a) : Fraction(a, 1u) {}
 
@@ -43,14 +45,21 @@ void Fraction::fromString(const char *str) {
     }
   }
   std::stringstream sstream(str);
+  char buf[bufSz];
+  char firstSymbol = '\0';
   int wholePart = 0;
   if (hasWhole) {
-    sstream >> wholePart;
+    sstream >> buf;
+    firstSymbol = buf[0];
+    wholePart = std::stoi(buf);
   }
-  char buf[bufSz];
   sstream.getline(buf, sizeof(buf), '/');
   this->numer = std::stoi(buf);
+  if (wholePart == 0 && firstSymbol == '-') {
+    this->numer *= -1;
+  }
   sstream >> this->denom;
+  checkDenom();
   if (wholePart < 0) {
     this->numer *= -1;
   }
@@ -131,10 +140,22 @@ std::ostream &operator<<(std::ostream &out, const Fraction &f) {
     out << wholePart;
     numer = std::abs(numer) % f.denom;
   }
-  if (numer > 0) {
-    out << ' ' << numer << '/' << f.denom;
+  if (wholePart != 0 && numer != 0) {
+    out << ' ';
+  }
+  if (numer != 0) {
+    out << numer << '/' << f.denom;
+  }
+  if (wholePart == 0 && numer == 0) {
+    out << wholePart;
   }
   return out;
+}
+
+void Fraction::checkDenom() {
+  if (this->denom == 0) {
+    throw std::runtime_error("Denominator cannot be 0");
+  }
 }
 
 void Fraction::simplify() {

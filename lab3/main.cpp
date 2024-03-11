@@ -1,12 +1,18 @@
 #include "fraction/fraction.hpp"
 #include <clocale>
 #include <iostream>
+#include <stdexcept>
 
 int main() {
   setlocale(LC_ALL, ".UTF8");
   std::cout << "Введите дробь: \n";
   Fraction z;
-  std::cin >> z;
+  try {
+    std::cin >> z;
+  } catch (const std::runtime_error &e) {
+    std::cout << e.what() << std::endl;
+    return 0;
+  }
   std::cout << "z=" << z << std::endl;
   Fraction fr1(10, 14), fr2;
   std::cout << "fr2=" << fr2 << std::endl;
