@@ -1,4 +1,4 @@
-#include "Fraction/Fraction.hpp"
+#include "fraction/fraction.hpp"
 #include <clocale>
 #include <iostream>
 
