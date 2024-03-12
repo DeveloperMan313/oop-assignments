@@ -1,10 +1,18 @@
 cmake_minimum_required(VERSION 3.23)
-project(lab2)
+
+set(project "lab2")
+project(${project})
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(lab2 main.cpp)
+add_subdirectory(planet)
+add_subdirectory(computer)
+add_subdirectory(input)
 
-IF (NOT WIN32)
-target_link_libraries(lab2 m)
-ENDIF()
+add_executable(${project} main.cpp)
+
+target_link_libraries(${project} planet computer input)
+
+if(NOT WIN32)
+  target_link_libraries(${project} m)
+endif()
