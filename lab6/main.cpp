@@ -1,8 +1,9 @@
+#include "Polynomial/Polynomial.hpp"
 #include <iostream>
-#include <cstring>
 
 int main() {
-    setlocale(LC_ALL, "Russian");
-    // сюда решение
-    return 0;
+  Polynomial p;
+  std::cin >> p;
+  std::cout << p << std::endl;
+  return 0;
 }
