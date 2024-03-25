@@ -73,7 +73,7 @@ Polynomial &Polynomial::operator*=(const Polynomial &p) {
   return *this;
 }
 
-int Polynomial::operator[](size_t power) const {
+int Polynomial::operator[](int power) const {
   const size_t thisSz = this->poly_.getSize();
   for (size_t i = 0; i < thisSz; ++i) {
     if (this->poly_[i]->power == power) {

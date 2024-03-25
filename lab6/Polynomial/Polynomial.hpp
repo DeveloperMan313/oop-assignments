@@ -1,11 +1,10 @@
 #include "../MyVector/MyVector.hpp"
 #include "../Term/Term.hpp"
-#include <cstddef>
 #include <istream>
 
 class Polynomial {
 public:
-  Polynomial(const Term &t);
+  explicit Polynomial(const Term &t);
 
   Polynomial(int coef = 0, int power = 0);
 
@@ -21,7 +20,7 @@ public:
 
   Polynomial &operator*=(const Polynomial &p);
 
-  int operator[](size_t power) const;
+  int operator[](int power) const;
 
   friend Polynomial operator+(const Polynomial &p1, const Polynomial &p2);
 
