@@ -1,6 +1,8 @@
 #include "MyVector.hpp"
 #include <algorithm>
 #include <cstddef>
+#include <cstring>
+#include <iostream>
 #include <stdexcept>
 
 template <typename T> const size_t MyVector<T>::initCapacity = 1;
@@ -13,6 +15,10 @@ MyVector<T>::MyVector() : capacity(0), size(0), removedCnt(0), array(nullptr) {}
 template <typename T>
 MyVector<T>::MyVector(const MyVector<T> &vector) : MyVector<T>() {
   this->copy(vector);
+}
+
+template <typename T> MyVector<T>::MyVector(const T &element) : MyVector<T>() {
+  this->push(element);
 }
 
 template <typename T> MyVector<T>::~MyVector() { this->clear(); }
@@ -31,7 +37,7 @@ template <typename T> void MyVector<T>::push(const T &element) {
   if (this->size == this->capacity) {
     this->resize(this->capacity * MyVector<T>::resizeFactor);
   }
-  this->array[this->size] = new T(element);
+  this->array[this->size] = MyVector<T>::copyElement(element);
   ++this->size;
   if (this->removedCnt > 0) {
     --this->removedCnt;
@@ -39,7 +45,7 @@ template <typename T> void MyVector<T>::push(const T &element) {
 }
 
 template <typename T> void MyVector<T>::remove(size_t idx) {
-  delete this->array[idx];
+  MyVector<T>::deleteElement(this->array[idx]);
   this->array[idx] = nullptr;
   ++this->removedCnt;
 }
@@ -47,7 +53,7 @@ template <typename T> void MyVector<T>::remove(size_t idx) {
 template <typename T> void MyVector<T>::resize(size_t newCapacity) {
   if (newCapacity < this->size) {
     for (size_t i = newCapacity; i < this->size; ++i) {
-      delete this->array[i];
+      MyVector<T>::deleteElement(this->array[i]);
     }
     this->size = newCapacity;
   }
@@ -62,7 +68,7 @@ template <typename T> void MyVector<T>::resize(size_t newCapacity) {
 
 template <typename T> void MyVector<T>::clear() {
   for (size_t i = 0; i < this->size; ++i) {
-    delete this->array[i];
+    MyVector<T>::deleteElement(this->array[i]);
   }
   delete[] this->array;
   this->array = nullptr;
@@ -90,7 +96,7 @@ template <typename T> size_t MyVector<T>::find(const T &element) const {
       throw std::runtime_error("met nullptr while searching");
     }
     const T &el = *this->array[m];
-    if (el == element) {
+    if (MyVector<T>::eq(&el, &element)) {
       return m;
     }
     if (MyVector<T>::cmp(&el, &element)) {
@@ -113,16 +119,42 @@ template <typename T> void MyVector<T>::operator=(const MyVector<T> &vector) {
   this->copy(vector);
 }
 
+template <typename U>
+std::ostream &operator<<(std::ostream &out, const MyVector<U> &vector) {
+  out << '[';
+  for (size_t i = 0; i < vector.size; ++i) {
+    out << *vector.array[i];
+    if (i < vector.size - 1) {
+      out << ", ";
+    }
+  }
+  out << ']';
+  return out;
+}
+
+template <typename T> bool MyVector<T>::eq(const T *lhs, const T *rhs) {
+  return *lhs == *rhs;
+}
+
+template <>
+bool MyVector<const char *>::eq(const char *const *lhs,
+                                const char *const *rhs) {
+  return std::strcmp(*lhs, *rhs) == 0;
+}
+
 template <typename T> void MyVector<T>::copy(const MyVector<T> &vector) {
-  if (vector.array == nullptr || this->array == vector.array) {
+  if (this->array == vector.array) {
     return;
   }
   this->clear();
+  if (vector.array == nullptr) {
+    return;
+  }
   this->capacity = vector.capacity;
   this->size = vector.size;
   this->array = new T *[this->capacity];
   for (size_t i = 0; i < this->size; ++i) {
-    this->array[i] = new T(*vector.array[i]);
+    this->array[i] = MyVector<T>::copyElement(*vector.array[i]);
   }
 }
 
@@ -141,4 +173,36 @@ template <typename T> bool MyVector<T>::cmp(const T *lhs, const T *rhs) {
   return *lhs < *rhs;
 }
 
+template <>
+bool MyVector<const char *>::cmp(const char *const *lhs,
+                                 const char *const *rhs) {
+  return std::strcmp(*lhs, *rhs) < 0;
+}
+
+template <typename T> T *MyVector<T>::copyElement(const T &element) {
+  return new T(element);
+}
+
+template <>
+const char **MyVector<const char *>::copyElement(const char *const &str) {
+  const size_t strSz = std::strlen(str) + 1;
+  char **newStr = new char *;
+  *newStr = new char[strSz];
+  std::strncpy(*newStr, str, strSz);
+  return const_cast<const char **>(newStr);
+}
+
+template <typename T> void MyVector<T>::deleteElement(const T *element) {}
+
+template <>
+void MyVector<const char *>::deleteElement(const char *const *strPtr) {
+  delete[] *strPtr;
+  delete strPtr;
+}
+
 template class MyVector<int>;
+template std::ostream &operator<<(std::ostream &out,
+                                  const MyVector<int> &vector);
+template class MyVector<const char *>;
+template std::ostream &operator<<(std::ostream &out,
+                                  const MyVector<const char *> &vector);

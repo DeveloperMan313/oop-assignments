@@ -1,6 +1,12 @@
 #include "MySet.hpp"
 #include <cstddef>
-#include <iostream>
+
+template <typename T> MySet<T>::MySet() : MyVector<T>() {}
+
+template <typename T> MySet<T>::MySet(const MySet<T> &set) : MyVector<T>(set) {}
+
+template <typename T>
+MySet<T>::MySet(const T &element) : MyVector<T>(element) {}
 
 template <typename T> bool MySet<T>::isElement(const T &element) const {
   try {
@@ -74,7 +80,7 @@ template <typename T> bool MySet<T>::operator==(const MySet<T> &set) const {
     return false;
   }
   for (size_t i = 0; i < this->size; ++i) {
-    if (*this->array[i] != *set.array[i]) {
+    if (!MyVector<T>::eq(this->array[i], set.array[i])) {
       return false;
     }
   }
@@ -96,3 +102,6 @@ std::ostream &operator<<(std::ostream &out, const MySet<U> &set) {
 
 template class MySet<int>;
 template std::ostream &operator<<(std::ostream &out, const MySet<int> &set);
+template class MySet<const char *>;
+template std::ostream &operator<<(std::ostream &out,
+                                  const MySet<const char *> &set);

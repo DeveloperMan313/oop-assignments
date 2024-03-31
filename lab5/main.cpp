@@ -1,19 +1,66 @@
 #include "MySet/MySet.hpp"
+#include "MyVector/MyVector.hpp"
 #include <iostream>
 
 int main() {
-  MySet<int> s1;
-  s1.addElement(1);
-  s1.addElement(4);
-  s1.addElement(5);
-  s1.addElement(6);
-  MySet<int> s2;
-  s2.addElement(1);
-  s2.addElement(2);
-  s2.addElement(3);
-  s2.addElement(4);
-  std::cout << s1 << " + " << s2 << " => " << s1 + s2 << std::endl;
-  std::cout << s1 << " * " << s2 << " => " << s1 * s2 << std::endl;
-  std::cout << s1 << " - " << s2 << " => " << s1 - s2 << std::endl;
+  setlocale(LC_ALL, ".UTF8");
+  MyVector<const char *> v("Hello!");
+  v.push("Привет!");
+  v.push("Привет!");
+  v.push("Привет!");
+  v.push("Привет!");
+  v.push("Привет!");
+  std::cout << "Вектор v: " << v << std::endl;
+  v.push("Привет!");
+  v.push("Привет!");
+  v.push("Привет!");
+  std::cout << "Вектор v: " << v << std::endl;
+  MyVector v1 = v;
+  std::cout << "Вектор v1: " << v1 << std::endl;
+  v1.clear();
+  std::cout << "Вектор v1: " << v1 << std::endl;
+  MySet<const char *> s("Yes"), s1, s2;
+  s.addElement("Привет!");
+  s.addElement("No");
+  const char *str = "Hello!";
+  s.addElement(str);
+  std::cout << "Множество s: " << s << std::endl;
+  s1.addElement("Cat");
+  s1.addElement("No");
+  s1.addElement("Привет!");
+  std::cout << "Множество s1: " << s1 << std::endl;
+  s2 = s1 - s;
+  std::cout << "Множество s2=s1-s: " << s2 << std::endl;
+  std::cout << "Множество s1: " << s1 << std::endl;
+  std::cout << "Множество s: " << s << std::endl;
+  s2 = s - s1;
+  std::cout << "Множество s2=s-s1: " << s2 << std::endl;
+  std::cout << "Множество s1: " << s1 << std::endl;
+  std::cout << "Множество s: " << s << std::endl;
+  s2 = s1 + s;
+  std::cout << "Множество s2=s1+s: " << s2 << std::endl;
+  std::cout << "Множество s1: " << s1 << std::endl;
+  std::cout << "Множество s: " << s << std::endl;
+  s2 = s1 * s;
+  std::cout << "Множество s2=s1*s: " << s2 << std::endl;
+  std::cout << "Множество s1: " << s1 << std::endl;
+  std::cout << "Множество s: " << s << std::endl;
+  MySet s3 = s2;
+  std::cout << "Множество s3=s2: " << s3 << std::endl;
+  if (s3 == s2) {
+    std::cout << "Множество s3=s2\n";
+  } else {
+    std::cout << "Множество s3!=s2\n";
+  }
+  if (s3 == s1) {
+    std::cout << "Множество s3=s1\n";
+  } else {
+    std::cout << "Множество s3!=s1\n";
+  }
+  if (s1 == s3) {
+    std::cout << "Множество s1=s3\n";
+  } else {
+    std::cout << "Множество s1!=s3\n";
+  }
   return 0;
 }

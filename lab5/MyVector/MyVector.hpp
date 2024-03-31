@@ -1,10 +1,15 @@
+#pragma once
+
 #include <cstddef>
+#include <ostream>
 
 template <typename T> class MyVector {
 public:
   MyVector();
 
   MyVector(const MyVector<T> &vector);
+
+  explicit MyVector(const T &element);
 
   ~MyVector();
 
@@ -30,9 +35,14 @@ public:
 
   void operator=(const MyVector<T> &vector);
 
+  template <typename U>
+  friend std::ostream &operator<<(std::ostream &out, const MyVector<U> &vector);
+
 protected:
   T **array;
   size_t size;
+
+  static bool eq(const T *lhs, const T *rhs);
 
 private:
   size_t capacity, removedCnt;
@@ -44,4 +54,8 @@ private:
   static bool cmpWithNullptrs(const T *lhs, const T *rhs);
 
   static bool cmp(const T *lhs, const T *rhs);
+
+  static T *copyElement(const T &element);
+
+  static void deleteElement(const T *element);
 };

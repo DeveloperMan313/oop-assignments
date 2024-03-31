@@ -1,8 +1,16 @@
+#pragma once
+
 #include "../MyVector/MyVector.hpp"
 #include <ostream>
 
 template <typename T> class MySet : private MyVector<T> {
 public:
+  MySet();
+
+  MySet(const MySet<T> &set);
+
+  explicit MySet(const T &element);
+
   using MyVector<T>::getSize;
 
   bool isElement(const T &element) const;
