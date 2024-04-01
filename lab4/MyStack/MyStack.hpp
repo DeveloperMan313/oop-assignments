@@ -24,7 +24,7 @@ public:
 
   ~MyStack() { this->clear(); }
 
-  bool empty() { return top == nullptr; }
+  bool empty() const { return top == nullptr; }
 
   void push(INFO info) {
     Node *newTop = new Node;
@@ -45,9 +45,9 @@ public:
     }
   }
 
-  INFO topInfo() { return this->top->info; }
+  INFO topInfo() const { return this->top->info; }
 
-  void print(const char *sep) {
+  void print(const char *sep) const {
     Node *node = this->top;
     while (node != nullptr) {
       std::cout << node->info;
@@ -59,7 +59,7 @@ public:
     std::cout << std::endl;
   }
 
-  void printReversed(const char *sep) {
+  void printReversed(const char *sep) const {
     MyStack<INFO> stack;
     Node *node = this->top;
     while (node != nullptr) {
@@ -81,16 +81,18 @@ public:
       return;
     }
     this->clear();
-    MyStack<INFO> temp;
-    Node *node = stack.top;
-    while (node != nullptr) {
-      temp.push(node->info);
-      node = node->next;
+    if (stack.empty()) {
+      return;
     }
-    node = temp.top;
-    while (node != nullptr) {
-      this->push(node->info);
-      node = node->next;
+    this->top = new Node;
+    Node *thisNode = this->top;
+    Node *otherNode = stack.top;
+    thisNode->info = otherNode->info;
+    while (otherNode->next != nullptr) {
+      otherNode = otherNode->next;
+      thisNode->next = new Node;
+      thisNode = thisNode->next;
+      thisNode->info = otherNode->info;
     }
   }
 };
