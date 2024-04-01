@@ -4,6 +4,18 @@
 
 int main() {
   setlocale(LC_ALL, ".UTF8");
+  MySet<int> n1, n2;
+  n1.addElement(1);
+  n1.addElement(4);
+  n1.addElement(5);
+  n1.addElement(6);
+  n2.addElement(1);
+  n2.addElement(2);
+  n2.addElement(3);
+  n2.addElement(4);
+  std::cout << n1 << " + " << n2 << " => " << n1 + n2 << std::endl;
+  std::cout << n1 << " * " << n2 << " => " << n1 * n2 << std::endl;
+  std::cout << n1 << " - " << n2 << " => " << n1 - n2 << std::endl;
   MyVector<const char *> v("Hello!");
   v.push("Привет!");
   v.push("Привет!");

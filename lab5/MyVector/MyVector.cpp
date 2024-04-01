@@ -192,7 +192,9 @@ const char **MyVector<const char *>::copyElement(const char *const &str) {
   return const_cast<const char **>(newStr);
 }
 
-template <typename T> void MyVector<T>::deleteElement(const T *element) {}
+template <typename T> void MyVector<T>::deleteElement(const T *element) {
+  delete element;
+}
 
 template <>
 void MyVector<const char *>::deleteElement(const char *const *strPtr) {
