@@ -66,14 +66,7 @@ public:
       stack.push(node->info);
       node = node->next;
     }
-    while (!stack.empty()) {
-      std::cout << stack.topInfo();
-      stack.pop();
-      if (stack.top != nullptr) {
-        std::cout << sep;
-      }
-    }
-    std::cout << std::endl;
+    stack.print(sep);
   }
 
   void operator=(const MyStack<INFO> &stack) {
