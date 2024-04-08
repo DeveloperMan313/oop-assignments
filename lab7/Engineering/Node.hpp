@@ -5,9 +5,17 @@
 
 class Node : public Part {
 public:
-  using Part::Part;
+  Node();
+
+  Node(const Node &node);
+
+  explicit Node(const char *name_, double partMass_ = 0.0,
+                double nodeSize_ = 0.0);
 
   void show() const override;
+
+protected:
+  double nodeSize;
 };
 
 #endif

@@ -7,7 +7,7 @@ public:
 
   Part(const Part &part);
 
-  Part(const char *name_, double mass_);
+  explicit Part(const char *name_, double partMass_ = 0.0);
 
   virtual ~Part();
 
@@ -21,7 +21,7 @@ public:
 
 protected:
   char *name;
-  double mass;
+  double partMass;
   Part *prev, *next;
 
   void setName(const char *name_);
