@@ -18,7 +18,7 @@ MyVector<T>::MyVector(const MyVector<T> &vector) : MyVector<T>() {
 }
 
 template <typename T> MyVector<T>::MyVector(const T &element) : MyVector<T>() {
-  this->push(element);
+  this->addElement(element);
 }
 
 template <typename T> MyVector<T>::~MyVector() { this->clear(); }
@@ -29,7 +29,7 @@ template <typename T> size_t MyVector<T>::getCapacity() const {
 
 template <typename T> size_t MyVector<T>::getSize() const { return this->size; }
 
-template <typename T> void MyVector<T>::push(const T &element) {
+template <typename T> void MyVector<T>::addElement(const T &element) {
   if (this->array == nullptr) {
     this->capacity = MyVector<T>::initCapacity;
     this->array = new T *[this->capacity];
@@ -44,10 +44,15 @@ template <typename T> void MyVector<T>::push(const T &element) {
   }
 }
 
-template <typename T> void MyVector<T>::remove(size_t idx) {
+template <typename T> void MyVector<T>::removeElement(size_t idx) {
   MyVector<T>::deleteElement(this->array[idx]);
   this->array[idx] = nullptr;
   ++this->removedCnt;
+  const size_t &resizeFactor = MyVector<T>::resizeFactor;
+  if (this->size > MyVector<T>::initCapacity &&
+      this->size < this->capacity / resizeFactor / resizeFactor) {
+    this->resize(this->capacity / resizeFactor);
+  }
 }
 
 template <typename T> void MyVector<T>::resize(size_t newCapacity) {
