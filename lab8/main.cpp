@@ -19,7 +19,11 @@ void task1() {
   const size_t firstLetterIdx = str.find_first_not_of(" ");
   str = str.substr(firstLetterIdx,
                    str.find_last_not_of(" ") + 1 - firstLetterIdx);
-  std::swap(str[0], str[str.find_last_of(" ") + 1]);
+  const size_t lastSpaceIdx = str.find_last_of(" ");
+  std::cout
+      << "Индекс последнего пробела перед последним словом в исходной строке: "
+      << firstLetterIdx + lastSpaceIdx << std::endl;
+  std::swap(str[0], str[lastSpaceIdx + 1]);
   std::cout << str << std::endl;
 }
 
@@ -222,6 +226,7 @@ void task9() {
 
 int main() {
   setlocale(LC_ALL, ".UTF8");
+  srand(time(nullptr));
   task1();
   task2();
   task3();
