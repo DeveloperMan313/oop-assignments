@@ -1,5 +1,4 @@
 #include "Term.hpp"
-#include <format>
 #include <istream>
 #include <stdexcept>
 
@@ -50,7 +49,7 @@ std::istream &operator>>(std::istream &in, Term &t) {
 std::ostream &operator<<(std::ostream &out, const Term &t) {
   if (t.coef == -1) {
     out << '-';
-  } else if (t.coef != 1 || t.coef != 0 && t.power == 0) {
+  } else if (t.coef != 1 || t.power == 0) {
     out << t.coef;
   }
   if (t.power != 0) {

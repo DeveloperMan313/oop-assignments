@@ -17,9 +17,9 @@ public:
 
   size_t getSize() const;
 
-  void push(const T &element);
+  void addElement(const T &element);
 
-  void remove(size_t idx);
+  void removeElement(size_t idx);
 
   void resize(size_t newCapacity);
 

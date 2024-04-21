@@ -21,18 +21,18 @@ template <typename T> void MySet<T>::addElement(const T &element) {
   if (this->isElement(element)) {
     return;
   }
-  this->push(element);
+  this->MyVector<T>::addElement(element);
   this->sortUpdateSize();
 }
 
-template <typename T> void MySet<T>::deleteElement(const T &element) {
+template <typename T> void MySet<T>::removeElement(const T &element) {
   size_t idx;
   try {
     idx = this->find(element);
   } catch (...) {
     return;
   }
-  this->remove(idx);
+  this->MyVector<T>::removeElement(idx);
   this->sortUpdateSize();
 }
 
@@ -44,14 +44,14 @@ template <typename T> void MySet<T>::operator+=(const MySet<T> &set) {
 
 template <typename T> void MySet<T>::operator-=(const MySet<T> &set) {
   for (size_t i = 0; i < set.size; ++i) {
-    this->deleteElement(*set.array[i]);
+    this->removeElement(*set.array[i]);
   }
 }
 
 template <typename T> void MySet<T>::operator*=(const MySet<T> &set) {
   for (size_t i = 0; i < this->size; ++i) {
     if (!set.isElement(*this->array[i])) {
-      this->remove(i);
+      this->MyVector<T>::removeElement(i);
     }
   }
   this->sortUpdateSize();

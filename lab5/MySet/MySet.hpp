@@ -17,7 +17,7 @@ public:
 
   void addElement(const T &element);
 
-  void deleteElement(const T &element);
+  void removeElement(const T &element);
 
   using MyVector<T>::clear;
 
