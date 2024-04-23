@@ -2,15 +2,18 @@
 #include <cstring>
 #include <iostream>
 
-Mechanism::Mechanism() : Node::Node() { this->setMechanismType(""); }
+Mechanism::Mechanism() : Node::Node(), mechanismType(nullptr) {
+  this->setMechanismType("");
+}
 
-Mechanism::Mechanism(const Mechanism &mechanism) : Node::Node(mechanism) {
+Mechanism::Mechanism(const Mechanism &mechanism)
+    : Node::Node(mechanism), mechanismType(nullptr) {
   this->setMechanismType(mechanism.mechanismType);
 }
 
 Mechanism::Mechanism(const char *name_, double partMass_, double nodeSize_,
                      const char *mechanismType_)
-    : Node::Node(name_, partMass_, nodeSize_) {
+    : Node::Node(name_, partMass_, nodeSize_), mechanismType(nullptr) {
   if (mechanismType_ == nullptr) {
     this->setMechanismType("");
     return;

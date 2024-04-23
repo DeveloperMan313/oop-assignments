@@ -6,18 +6,19 @@
 
 Part *Part::dllTop = nullptr;
 
-Part::Part() : partMass(0.0), prev(nullptr), next(nullptr) {
+Part::Part() : name(nullptr), partMass(0.0), prev(nullptr), next(nullptr) {
   this->setName("");
   this->dllAdd();
 }
 
-Part::Part(const Part &part) : prev(nullptr), next(nullptr) {
+Part::Part(const Part &part) : name(nullptr), prev(nullptr), next(nullptr) {
   this->setName(part.name);
   this->partMass = part.partMass;
   this->dllAdd();
 }
 
-Part::Part(const char *name_, double partMass_) : prev(nullptr), next(nullptr) {
+Part::Part(const char *name_, double partMass_)
+    : name(nullptr), prev(nullptr), next(nullptr) {
   if (partMass_ < 0.0) {
     throw std::invalid_argument("part mass cannot be negative");
   }
